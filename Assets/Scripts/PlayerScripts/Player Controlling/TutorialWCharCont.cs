@@ -20,23 +20,34 @@ public class TutorialWCharCont : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float moveSpeed;
 
+    private float horizontalInput;
+    private float verticalInput;
+
+    private bool isGrounded;
+    public LayerMask WhatIsGround;
+
     Vector3 move = Vector3.zero;
     private void Start()
     {
         cont = GetComponent<CharacterController>();
-
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update() {
-        moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        move = moveInput * Time.deltaTime * moveSpeed;
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            move.y = jumpForce;
-        }
+        moveCamera();
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, cont.height * 0.5f + 0.1f, WhatIsGround);
 
+        horizontalInput = Input.GetAxis("Horizontal");
+        verticalInput = Input.GetAxis("Vertical");
+
+        moveInput = transform.forward * verticalInput + transform.right * horizontalInput;
+        move = moveInput * Time.deltaTime * moveSpeed;
+        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+        {
+            move.y = Mathf.Sqrt(jumpForce * -2 * Physics.gravity.y);
+        }
         move += Physics.gravity;
-        
         
     }
 

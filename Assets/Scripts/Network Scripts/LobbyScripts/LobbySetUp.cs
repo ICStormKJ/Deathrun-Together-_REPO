@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -14,28 +15,43 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.UI;
+using static LobbyManager;
 
 public class LobbySetUp : MonoBehaviour
 {
     [SerializeField] private int capacity;
 
+    //-----fields to manage the heartbeats and lobby
     private Lobby hostLobby;
     private Lobby currentLobby;
     private float heartbeatTimer;
     [SerializeField] private float heartbeatTimerMax;
 
+    //-----Setting UI elements-----
     [SerializeField] private Button startGameButton;
     [SerializeField] private TMP_Text roomCode;
-    [SerializeField] private TMP_Text[] roomMembersTexts;
-    private TMP_Text myName;
+    [SerializeField] private RoomSlot[] slots;
     [SerializeField] private GameObject lobbyWarning;
 
     [SerializeField] private GameObject mainCanvas;
 
+    //-----Fields used when spawning players and level
     [SerializeField] Transform runnerSpawn;
     [SerializeField] Transform trapSpawn;
     [SerializeField] GameObject levelToActivate;
-    
+
+    [SerializeField] private OpenCloseMenu menu;
+
+    public static LobbySetUp Instance;
+    //public event EventHandler<LobbyEventArgs> OnJoinedLobby;
+    private PlayerData data;
+
+
+    private void Awake()
+    {
+        Instance = this;
+        data = FindFirstObjectByType<PlayerData>();
+    }
     async void Start()
     {
         await UnityServices.InitializeAsync();
@@ -46,12 +62,10 @@ public class LobbySetUp : MonoBehaviour
         };
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
         heartbeatTimer = heartbeatTimerMax;
-        foreach(TMP_Text roomMember in roomMembersTexts)
-        {
-            roomMember.text = "";
-        }
         levelToActivate.SetActive(false);
         lobbyWarning.SetActive(false);
+
+        //LobbyManager.Instance.OnJoinedLobby += UpdateLobbyEvent;
     }
 
     private void Update()
@@ -91,6 +105,8 @@ public class LobbySetUp : MonoBehaviour
             }; //END OF LOBBY OPTIONS
 
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(name, capacity, options);
+            var callbacks = new LobbyEventCallbacks();
+            //callbacks.PlayerDataAdded += UpdateLobbyEvent;
             hostLobby = lobby;
             currentLobby = hostLobby;
 
@@ -112,8 +128,14 @@ public class LobbySetUp : MonoBehaviour
                 Player = GetPlayer(),
             };
             currentLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code,options);
-            
-        }catch (LobbyServiceException ex) { ShowWarning(); }    
+            SetUpRoomUI();
+            if (currentLobby != null)
+                menu.Open();
+            else
+                ShowWarning();
+            Debug.Log(menu.isActiveAndEnabled);
+        }
+        catch (LobbyServiceException ex) { ShowWarning(); Debug.Log(ex); }    
     }
 
     public async void LeaveLobby()
@@ -121,26 +143,18 @@ public class LobbySetUp : MonoBehaviour
         try
         {
             await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, AuthenticationService.Instance.PlayerId);
-            for(int i = 0; i < roomMembersTexts.Length; i++) 
+            for(int i = 0; i < slots.Length; i++) 
             { 
-                if (roomMembersTexts[i].text.Equals(myName.text))
+                if (slots[i].name == data.displayName)
                 {
-                    roomMembersTexts[i].text = "";
+                    slots[i].RemovePlayer();
                     break;
                 }
             }
-            myName = null;
 
         } catch(LobbyServiceException ex) { Debug.Log(ex); }
     }
 
-/*    private void PlayerList(Lobby lobby)
-    {
-        foreach(Player player in lobby.Players) 
-        { 
-            Debug.Log("Player: " + player.Data["Player Name"].Value);
-        }
-    }*/
 
     private Player GetPlayer()
     {
@@ -148,7 +162,7 @@ public class LobbySetUp : MonoBehaviour
         {
             Data = new Dictionary<string, PlayerDataObject>
                     {
-                        {"Player Name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, name) }
+                        {"Player Name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, data.displayName) }
                     }
         };
     }
@@ -234,20 +248,32 @@ public class LobbySetUp : MonoBehaviour
     private void SetUpRoomUI()
     {
         roomCode.text = currentLobby.LobbyCode;
-        if (!NetworkManager.Singleton.IsHost)
+        for(int i = 0; i < slots.Length; i++)
         {
-            startGameButton.interactable = false;
-        }
-        for(int i = 0; i < roomMembersTexts.Length; i++)
-        {
-            if (roomMembersTexts[i].text.Equals(""))
+            if (!slots[i].isOccupied())
             {
-                roomMembersTexts[i].text = FindFirstObjectByType<PlayerData>().displayName;
-                myName = roomMembersTexts[i];
+                slots[i] = new RoomSlot(data.displayName);
                 break;
             }
         }
         
+    }
+
+    private void UpdateLobbyEvent(ILobbyChanges i)
+    {
+        UpdateLobby();
+    }
+
+    private void UpdateLobby()
+    {
+        for(int i = 0; i < slots.Length;i++)
+        {
+            if (!slots[i].isOccupied())
+            {
+                slots[i] = new RoomSlot(data.displayName);
+                break;
+            }
+        }
     }
 
 }

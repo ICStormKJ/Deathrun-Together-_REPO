@@ -4849,7 +4849,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 275335885}
-  - component: {fileID: 275335884}
   m_Layer: 5
   m_Name: LobbyManager
   m_TagString: Untagged
@@ -4857,38 +4856,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &275335884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 275335883}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ffdcc39007fb8f438acd05b69cbaa27, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  capacity: 10
-  heartbeatTimerMax: 15
-  startGameButton: {fileID: 437753879}
-  roomCode: {fileID: 605951259}
-  roomMembersTexts:
-  - {fileID: 1937387790}
-  - {fileID: 1292611331}
-  - {fileID: 579969108}
-  - {fileID: 1968241078}
-  - {fileID: 209609694}
-  - {fileID: 57505799}
-  - {fileID: 115781842}
-  - {fileID: 226684125}
-  - {fileID: 1066180491}
-  - {fileID: 516015915}
-  lobbyWarning: {fileID: 1455460129}
-  mainCanvas: {fileID: 1770782242}
-  runnerSpawn: {fileID: 0}
-  trapSpawn: {fileID: 0}
-  levelToActivate: {fileID: 992416929}
 --- !u!224 &275335885
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7179,7 +7146,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 275335884}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: LobbySetUp, Assembly-CSharp
         m_MethodName: StartGame
         m_Mode: 1
@@ -8143,31 +8110,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 495823843}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 275335884}
-        m_TargetAssemblyTypeName: TestLobby, Assembly-CSharp
-        m_MethodName: CreateLobby
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: Test 1
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 495823845}
-        m_TargetAssemblyTypeName: OpenCloseMenu, Assembly-CSharp
-        m_MethodName: Open
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &495823843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11540,7 +11483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   field: {fileID: 200373117}
-  lobbyManager: {fileID: 275335884}
+  lobbyManager: {fileID: 0}
 --- !u!114 &675429864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21926,7 +21869,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 275335884}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: LobbySetUp, Assembly-CSharp
         m_MethodName: LeaveLobby
         m_Mode: 1
