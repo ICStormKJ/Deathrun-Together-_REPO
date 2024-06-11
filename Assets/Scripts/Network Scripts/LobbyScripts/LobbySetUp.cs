@@ -30,7 +30,7 @@ public class LobbySetUp : MonoBehaviour
     //-----Setting UI elements-----
     [SerializeField] private Button startGameButton;
     [SerializeField] private TMP_Text roomCode;
-    [SerializeField] private RoomSlot[] slots;
+    //[SerializeField] private RoomSlot[] slots;
     [SerializeField] private GameObject lobbyWarning;
 
     [SerializeField] private GameObject mainCanvas;
@@ -111,7 +111,6 @@ public class LobbySetUp : MonoBehaviour
             currentLobby = hostLobby;
 
             Debug.Log("Created Lobby: " + lobby.LobbyCode);
-            SetUpRoomUI();
             //PlayerList(lobby);
         } catch (LobbyServiceException ex)
         {
@@ -128,7 +127,6 @@ public class LobbySetUp : MonoBehaviour
                 Player = GetPlayer(),
             };
             currentLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code,options);
-            SetUpRoomUI();
             if (currentLobby != null)
                 menu.Open();
             else
@@ -138,22 +136,7 @@ public class LobbySetUp : MonoBehaviour
         catch (LobbyServiceException ex) { ShowWarning(); Debug.Log(ex); }    
     }
 
-    public async void LeaveLobby()
-    {
-        try
-        {
-            await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, AuthenticationService.Instance.PlayerId);
-            for(int i = 0; i < slots.Length; i++) 
-            { 
-                if (slots[i].name == data.displayName)
-                {
-                    slots[i].RemovePlayer();
-                    break;
-                }
-            }
 
-        } catch(LobbyServiceException ex) { Debug.Log(ex); }
-    }
 
 
     private Player GetPlayer()
@@ -245,35 +228,6 @@ public class LobbySetUp : MonoBehaviour
         lobbyWarning.SetActive(false);
     }
 
-    private void SetUpRoomUI()
-    {
-        roomCode.text = currentLobby.LobbyCode;
-        for(int i = 0; i < slots.Length; i++)
-        {
-            if (!slots[i].isOccupied())
-            {
-                slots[i] = new RoomSlot(data.displayName);
-                break;
-            }
-        }
-        
-    }
 
-    private void UpdateLobbyEvent(ILobbyChanges i)
-    {
-        UpdateLobby();
-    }
-
-    private void UpdateLobby()
-    {
-        for(int i = 0; i < slots.Length;i++)
-        {
-            if (!slots[i].isOccupied())
-            {
-                slots[i] = new RoomSlot(data.displayName);
-                break;
-            }
-        }
-    }
 
 }

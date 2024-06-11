@@ -76,7 +76,7 @@ public class PlayerManager : NetworkBehaviour
 
     private Rigidbody rb;
     private PlayerData data;
-    private NetworkVariable<bool> isTrapmaster = new NetworkVariable<bool>();
+    public NetworkVariable<bool> isTrapmaster = new NetworkVariable<bool>();
     private NetworkVariable<bool> victory = new NetworkVariable<bool>();
 
     void Start()
@@ -306,4 +306,11 @@ public class PlayerManager : NetworkBehaviour
     {
         return victory.Value;
     }
+
+    [ServerRpc]
+    public void SendPosToServerRPC(float x, float y, float z) //serverRPC to manage the player's position when spawning
+    {
+        transform.position = new Vector3(x, y, z);
+    }
+
 }

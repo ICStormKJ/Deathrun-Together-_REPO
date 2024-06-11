@@ -11,7 +11,7 @@ public class LobbyListSingleUI : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI lobbyNameText;
     [SerializeField] private TextMeshProUGUI playersText;
     [SerializeField] private TextMeshProUGUI gameModeText;
-
+    [SerializeField] private OpenCloseMenu lobbyUI;
 
     private Lobby lobby;
 
@@ -19,6 +19,7 @@ public class LobbyListSingleUI : MonoBehaviour {
     private void Awake() {
         GetComponent<Button>().onClick.AddListener(() => {
             LobbyManager.Instance.JoinLobby(lobby);
+            lobbyUI.Open();
         });
     }
 

@@ -56,6 +56,9 @@ public class GameManager : NetworkBehaviour
         if (IsHost) { clientsConnected = NetworkManager.Singleton.ConnectedClients; }
         playersPresent.Value = clientsConnected.Count;
         chooseRandomPlayer();
+
+        if (playerman.isTrapmaster.Value) { playerman.SendPosToServerRPC(trapMasterSpawnPoint.position.x, trapMasterSpawnPoint.position.y, trapMasterSpawnPoint.position.z); }
+        else { playerman.SendPosToServerRPC(runnerSpawnPoint.position.x, runnerSpawnPoint.position.y, runnerSpawnPoint.position.z); }
     }
 
     // Update is called once per frame

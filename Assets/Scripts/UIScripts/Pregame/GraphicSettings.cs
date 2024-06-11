@@ -64,6 +64,8 @@ public class GraphicSettings : MonoBehaviour
     public void SetResolution(Int32 index)
     {
         Resolution resolution = filteredResolutions[index];
-        Screen.SetResolution(resolution.width, resolution.height, true);
+        bool checkmax = (resolution.height >= 1080 && resolution.width >= 1920);
+        bool fullscreen = checkmax ? true : false;
+        Screen.SetResolution(resolution.width, resolution.height, fullscreen);
     }
 }

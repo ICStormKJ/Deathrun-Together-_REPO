@@ -7,7 +7,7 @@ using TMPro;
 public class InputEnterer : MonoBehaviour
 {
     //----------Class to manage confirm buttons for display name setting----------
-    [SerializeField] private TMP_InputField field;
+    [SerializeField] private TMP_Text field;
     private PlayerData playerData;
     [SerializeField] private LobbySetUp lobbyManager;
 
@@ -18,6 +18,7 @@ public class InputEnterer : MonoBehaviour
     public void SubmitDisplayName()
     {
         playerData.UpdateDisplayName(field.text);
+        LobbyManager.Instance.UpdatePlayerName(field.text);
     }
     public void SubmitLobbyCode()
     {

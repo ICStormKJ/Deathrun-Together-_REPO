@@ -13,22 +13,26 @@ public class PlayerData: MonoBehaviour
 
     //SETTER METHODS
     public void UpdateDisplayName(string d) { 
-        Debug.Log("Saved name as " + displayName); 
-        displayName = d; }
+        displayName = d;
+        Debug.Log("Saved name as " + displayName);
+    }
     public void UpdateElo(int e){
+        elo = e;
         Debug.Log("Your new elo is " + elo);
-        elo = e; }
+    }
     public void UpdateRank(Rank r)
     {
-        Debug.Log("Your new rank is: " + r);
         rank = r;
+        Debug.Log("Your new rank is: " + r);
     }
     public void saveRunner(Power p) {
+        runnerPower = p;
         Debug.Log("saved runner power");
-        runnerPower = p; }
+    }
     public void saveTrap(Power p) {
+        trapPower = p;
         Debug.Log("saved trapmaster power");
-        trapPower = p; }
+    }
     //----------Used for loading back into game build----------
     public void LoadDataBack(PlayerData d) 
     { 

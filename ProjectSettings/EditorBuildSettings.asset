@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/LobbyTutorial/LobbyTutorial_Done.unity
+    guid: be8200a558cfff84b8ce074fa6e33558
+  - enabled: 0
     path: Assets/Scenes/MainMenu.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
@@ -14,8 +17,5 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/TestStage.unity
     guid: 918bc2845579e194ab30a5edfa43e185
-  - enabled: 1
-    path: Assets/LobbyTutorial/LobbyTutorial_Done.unity
-    guid: be8200a558cfff84b8ce074fa6e33558
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

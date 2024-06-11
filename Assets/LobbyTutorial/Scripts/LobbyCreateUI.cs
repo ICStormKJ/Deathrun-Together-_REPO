@@ -11,14 +11,15 @@ public class LobbyCreateUI : MonoBehaviour {
 
 
     [SerializeField] private Button createButton;
-    [SerializeField] private Button lobbyNameButton;
+/*    [SerializeField] private Button lobbyNameButton;
     [SerializeField] private Button publicPrivateButton;
     [SerializeField] private Button maxPlayersButton;
-    [SerializeField] private Button gameModeButton;
+    [SerializeField] private Button gameModeButton;*/
     [SerializeField] private TextMeshProUGUI lobbyNameText;
     [SerializeField] private TextMeshProUGUI publicPrivateText;
     [SerializeField] private TextMeshProUGUI maxPlayersText;
     [SerializeField] private TextMeshProUGUI gameModeText;
+    [SerializeField] private TMP_Text titleInput;
 
 
     private string lobbyName;
@@ -31,15 +32,15 @@ public class LobbyCreateUI : MonoBehaviour {
 
         createButton.onClick.AddListener(() => {
             LobbyManager.Instance.CreateLobby(
-                lobbyName,
-                maxPlayers,
-                isPrivate,
-                gameMode
-            );
+                titleInput.text,
+                10,
+                false,
+                LobbyManager.GameMode.Conquest
+            );;
             Hide();
         });
 
-        lobbyNameButton.onClick.AddListener(() => {
+/*        lobbyNameButton.onClick.AddListener(() => {
             UI_InputWindow.Show_Static("Lobby Name", lobbyName, "abcdefghijklmnopqrstuvxywzABCDEFGHIJKLMNOPQRSTUVXYWZ .,-", 20,
             () => {
                 // Cancel
@@ -77,9 +78,7 @@ public class LobbyCreateUI : MonoBehaviour {
                     break;
             }
             UpdateText();
-        });
-
-        Hide();
+        });*/
     }
 
     private void UpdateText() {
@@ -102,6 +101,11 @@ public class LobbyCreateUI : MonoBehaviour {
         gameMode = LobbyManager.GameMode.CaptureTheFlag;
 
         UpdateText();
+    }
+
+    public void ShowButton()
+    {
+        createButton.gameObject.SetActive(true);
     }
 
 }

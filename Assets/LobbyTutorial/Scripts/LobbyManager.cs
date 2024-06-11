@@ -1,13 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
+using Unity.Networking.Transport.Relay;
+using Unity.Netcode.Transports.UTP;
+using System.Threading.Tasks;
+using UnityEngine.UI;
 
-public class LobbyManager : MonoBehaviour {
+public class LobbyManager : NetworkBehaviour {
 
 
     public static LobbyManager Instance { get; private set; }
@@ -17,7 +24,11 @@ public class LobbyManager : MonoBehaviour {
     public const string KEY_PLAYER_CHARACTER = "Character";
     public const string KEY_GAME_MODE = "GameMode";
 
-
+    [SerializeField] private GameObject mainCanvas;
+    //-----Fields used when spawning players and level
+    [SerializeField] Transform runnerSpawn;
+    [SerializeField] Transform trapSpawn;
+    [SerializeField] GameObject levelToActivate;
 
     public event EventHandler OnLeftLobby;
 
@@ -57,6 +68,7 @@ public class LobbyManager : MonoBehaviour {
 
     private void Awake() {
         Instance = this;
+        Authenticate("default");
     }
 
     private void Update() {
@@ -351,6 +363,78 @@ public class LobbyManager : MonoBehaviour {
         } catch (LobbyServiceException e) {
             Debug.Log(e);
         }
+    }
+    public async void StartGame()
+    {
+        try
+        {
+            string relayCode = CreateRelay().Result;
+            //----------retrieves the relayCode required, checks if we have it, and starts the game.
+            Lobby lobby = await Lobbies.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
+            {
+                Data = new Dictionary<string, DataObject> {
+                    {"Start", new DataObject (DataObject.VisibilityOptions.Member,relayCode) }
+                }
+
+            });
+            joinedLobby = lobby;
+            levelToActivate.SetActive(true); //activates the level with the actual stuff
+            if (!NetworkManager.Singleton.IsHost)
+            {
+                JoinRelay(joinedLobby.Data["Start"].Value);
+                SendPosToServerRPC(runnerSpawn.position.x, runnerSpawn.position.y, runnerSpawn.position.z);
+            }
+            else
+            {
+                SendPosToServerRPC(trapSpawn.position.x, trapSpawn.position.y, trapSpawn.position.z);
+            }
+
+            if (joinedLobby.Data["Start"].Value != "0")
+            {
+                mainCanvas.SetActive(false);
+                FindFirstObjectByType<GameManager>().gameObject.SetActive(true);
+            }
+
+            joinedLobby = null;
+        }
+        catch (LobbyServiceException ex) { Debug.Log(ex); }
+    }
+
+    [ServerRpc]
+    private void SendPosToServerRPC(float x, float y, float z) //serverRPC to manage the player's position when spawning
+    {
+        transform.position = new Vector3(x, y, z);
+    }
+    //----------creates a relay allocation and connects to network manager----------
+    private async Task<string> CreateRelay()
+    {
+        try
+        {
+            Allocation alloc = await RelayService.Instance.CreateAllocationAsync(9);
+
+            //creates and sets server relay data so that relay can connect to network transform and stuff
+            RelayServerData data = new RelayServerData(alloc, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data);
+            NetworkManager.Singleton.StartHost();
+            return await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId);
+
+
+        }
+        catch (RelayServiceException ex) { Debug.Log(ex); return null; }
+    }
+    //----------takes in the code used to attempt to join the relay needed to connect in a lobby----------
+    private async void JoinRelay(string relayCode)
+    {
+        try
+        {
+            JoinAllocation joinalloc = await RelayService.Instance.JoinAllocationAsync(relayCode);
+
+            RelayServerData data = new RelayServerData(joinalloc, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data);
+            NetworkManager.Singleton.StartClient();
+
+        }
+        catch (RelayServiceException ex) { Debug.Log(ex); }
     }
 
 }

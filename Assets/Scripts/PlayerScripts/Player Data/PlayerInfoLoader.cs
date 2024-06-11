@@ -11,6 +11,7 @@ public class PlayerInfoLoader : MonoBehaviour
     [SerializeField] private TMP_InputField field;
     void Start()
     {
+        Screen.SetResolution(1920, 1080, true);
         retrievedData = PlayerDataStorer.Load(); 
         if (retrievedData == null)
         {
